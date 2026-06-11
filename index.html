@@ -466,18 +466,18 @@ function TicketMini({ tier = "vvip", host = "Mina Live", time = "Today 9:00 PM",
 }
 
 // platform invite ticket — not tied to a broadcast (new proposal)
-function PassTicket({ code = "7K2DQX9A", note = "Enjoy one live for free.", state = "", who, when, pendingLabel, compact = false, howto = false }) {
+function PassTicket({ code = "7K2DQX9A", note = "Enjoy one live for free.", state = "", who, when, pendingLabel, compact = false, howto = false, noQr = false, share }) {
   return (
     <div className={"ticket" + (state === "redeemed" ? " expired" : "") + (compact ? " compact" : "")} style={{ width: "100%" }}>
       <div className="top" style={compact ? { padding: "6px 11px", gap: 2 } : undefined}>
         <span className="tier-badge vvip" style={{ fontSize: 9 }}>FREE TICKET</span>
         <div style={{ fontSize: 12.5, fontWeight: 700 }}>Special invite</div>
-        <div className="tiny" style={{ color: "var(--ink-soft)" }}>{note}</div>
+        {note && <div className="tiny" style={{ color: "var(--ink-soft)" }}>{note}</div>}
         {!compact && <div className="tiny" style={{ color: "var(--ink-faint)", lineHeight: 1.3 }}>New films and series premiere every day. Watch and chat with creators live.</div>}
       </div>
       <div className="perf" style={compact ? { padding: "6px 11px" } : undefined}>
-        <div className="qr" style={compact ? { width: 36, height: 36 } : undefined} />
-        <div className="col" style={{ gap: compact ? 2 : 3, minWidth: 0 }}>
+        {!noQr && <div className="qr" style={compact ? { width: 36, height: 36 } : undefined} />}
+        <div className="col grow" style={{ gap: compact ? 2 : 3, minWidth: 0 }}>
           <div className="tiny mono">{code}</div>
           {state === "redeemed" && <Chip variant="ok"><span className="dot" /> Used</Chip>}
           {state === "pending" && <Chip><span className="dot" /> Unused</Chip>}
@@ -485,6 +485,7 @@ function PassTicket({ code = "7K2DQX9A", note = "Enjoy one live for free.", stat
           {state === "redeemed" && who && <div className="tiny mono" style={{ color: "var(--ink-faint)" }}>{who}{when ? " · " + when : ""}</div>}
           {when && state !== "redeemed" && !compact && <div className="tiny mono" style={{ color: "var(--ink-faint)" }}>{when}</div>}
         </div>
+        {share && <Btn sm variant="ghost">{share}</Btn>}
       </div>
       {howto && !compact && <TicketHowto />}
     </div>);
@@ -1804,13 +1805,10 @@ function MgCards() {
     <Phone step="C·02" title="My tickets" tag="Pick a ticket">
       <Scr className="pad0">
         <AppBar title="Manage tickets" right="1 left" />
-        <div className="scr" style={{ gap: 6, padding: "11px" }}>
-          <PassTicket code="3J9KAM4T" state="redeemed" who="@sarakim123" when="2d ago" compact />
-          <PassTicket code="7K2DQX9A" state="pending" when="opened via link" compact />
-          <div className="card flat" style={{ flexDirection: "row", alignItems: "center", gap: 9, borderStyle: "dashed", padding: "8px 10px" }}>
-            <span className="tiny grow">1 ticket available to send</span>
-            <Btn sm>Send</Btn>
-          </div>
+        <div className="scr" style={{ gap: 7, overflowY: "auto", padding: "11px" }}>
+          <PassTicket code="7K2DQX9A" note="" state="pending" pendingLabel="Not sent yet" share="Send" noQr compact />
+          <PassTicket code="9X4QLP2R" note="" state="pending" pendingLabel="Sent to @leopark · 1h ago" share="Share again" noQr compact />
+          <PassTicket code="3J9KAM4T" note="" state="redeemed" who="@sarakim123" when="3d ago" noQr compact />
         </div>
       </Scr>
     </Phone>);
@@ -2476,21 +2474,12 @@ function RcWhatsApp() {
           <span className="right">WhatsApp</span>
         </div>
         <div className="scr" style={{ gap: 7, background: "oklch(0.97 0.02 150)", justifyContent: "flex-end" }}>
-          <div className="bubble" style={{ maxWidth: "92%" }}>Here’s a free entry to my live tonight</div>
-          <div className="bubble" style={{ maxWidth: "94%", padding: 5 }}>
-            <PassTicket code="7K2DQX9A" note="Enjoy one live for free." compact />
+          <div className="bubble" style={{ maxWidth: "94%", padding: 7, display: "flex", flexDirection: "column", gap: 7 }}>
+            <span style={{ fontSize: 11.5, lineHeight: 1.45 }}>
+              @sarakim123 is inviting you to the live stream ‘<b>Movie Night Club</b>’ hosted by @mina. <span style={{ color: "#1666c0", wordBreak: "break-all" }}>https://live.app/r/mina-7k2q</span>
+            </span>
+            <RoomTicket compact />
           </div>
-          <div className="bubble" style={{ maxWidth: "94%", padding: 6, display: "flex", flexDirection: "column", gap: 6 }}>
-            <span style={{ fontSize: 11, color: "#1666c0", wordBreak: "break-all" }}>https://live.app/r/mina-7k2q</span>
-            <div className="linkcard" style={{ width: "100%" }}>
-              <Thumb label="Mina · live" style={{ height: 52, borderRadius: 0, border: 0, borderBottom: "1px solid var(--line)" }} />
-              <div style={{ padding: "6px 8px" }}>
-                <b style={{ fontSize: 11, display: "block" }}>Join Mina’s live room</b>
-                <span className="tiny" style={{ color: "var(--ink-soft)" }}>Tap to enter — your ticket comes with you</span>
-              </div>
-            </div>
-          </div>
-          <div className="bubble" style={{ maxWidth: "92%" }}>Tap the link to come in</div>
         </div>
       </Scr>
     </Phone>);
