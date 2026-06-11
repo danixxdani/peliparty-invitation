@@ -1720,6 +1720,50 @@ function PrSend({ step = "C·03", title = "Choose recipient", tag = "Send a tick
 
 }
 
+// C·05 — eligibility in search: each account can receive ONE guest ticket,
+// only within 30d of registering. Ineligible recipients get a disabled "Send";
+// tapping it explains why via a toast.
+function PrSendEligibility() {
+  const rows = [
+  { h: "@sarakim123", s: "follows you", ok: true },
+  { h: "@leopark", s: "Already has a ticket", ok: false },
+  { h: "@jesscho", s: "follows you", ok: true },
+  { h: "@danoh", s: "Joined 30+ days ago", ok: false }];
+
+  return (
+    <Phone step="C·05" title="Recipient eligibility" tag="One per account · 30d">
+      <Scr style={{ position: "relative" }}>
+        <h3 className="t" style={{ marginBottom: 1 }}>Send to a friend</h3>
+        <p className="tiny" style={{ margin: "0 2px 2px" }}>One free entry per account, within 30 days of joining</p>
+        <div className="searchbar"><span className="si">⌕</span>Search username</div>
+        <div className="col" style={{ gap: 0 }}>
+          {rows.map((u) =>
+          <div className="userrow" key={u.h} style={{ padding: "5px 2px" }}>
+              <div className="avatar sm" />
+              <div className="col grow" style={{ gap: 0, minWidth: 0 }}>
+                <span className="un">{u.h}</span>
+                <span className="uh" style={u.ok ? null : { textTransform: "none", whiteSpace: "normal", lineHeight: 1.2 }}>{u.s}</span>
+              </div>
+              {u.ok ?
+              <Btn sm>Send</Btn> :
+              <div className="btn sm" style={{ background: "var(--box-alt)", color: "var(--ink-faint)", border: "1.5px solid var(--line)", cursor: "not-allowed" }}>Send</div>}
+            </div>
+          )}
+        </div>
+        <div style={{ marginTop: "auto" }}>
+          <div className="sharesheet compact">
+            <div className="sharebtn"><span className="sicon">↗</span>Link</div>
+            <div className="sharebtn"><span className="sicon wa">WA</span>WhatsApp</div>
+            <div className="sharebtn"><span className="sicon ig">IG</span>Instagram</div>
+            <div className="sharebtn"><span className="sicon">▦</span>Save ticket</div>
+          </div>
+        </div>
+        <div className="toast" style={{ bottom: 64 }}><span className="dot" style={{ color: "var(--warn, #d98c00)" }} /> This user is not eligible to receive a guest ticket.</div>
+      </Scr>
+    </Phone>);
+
+}
+
 function PrSent() {
   return (
     <Phone step="C·04" title="Ticket sent" tag="In-app · 0 left">
@@ -2138,7 +2182,7 @@ function BcLiveInvited() {
 // redeem entry — profile-style screen (like C·01) but with a Redeem ticket button
 function RedeemProfile() {
   return (
-    <Phone step="C·07" title="Host profile" tag="Redeem entry">
+    <Phone step="C·08" title="Host profile" tag="Redeem entry">
       <Scr className="pad0">
         <div style={{ height: 56, background: "repeating-linear-gradient(45deg, var(--line) 0 1.5px, transparent 1.5px 11px), var(--box-alt)", borderBottom: "1px solid var(--line)" }} />
         <div className="scr" style={{ marginTop: -22 }}>
@@ -2180,7 +2224,7 @@ const CameraIcon = () =>
 
 function RedeemEntry() {
   return (
-    <Phone step="C·08" title="Redeem a ticket" tag="Code or image">
+    <Phone step="C·09" title="Redeem a ticket" tag="Code or image">
       <Scr className="pad0">
         <AppBar back title="Redeem a ticket" />
         <div className="scr" style={{ gap: 13 }}>
@@ -2203,7 +2247,7 @@ function RedeemEntry() {
 
 function RedeemScan() {
   return (
-    <Phone step="C·09" title="Ticket read from image" tag="Confirm">
+    <Phone step="C·10" title="Ticket read from image" tag="Confirm">
       <Scr className="pad0">
         <AppBar back title="Redeem a ticket" />
         <div className="scr" style={{ gap: 9 }}>
@@ -2233,11 +2277,11 @@ function RedeemDone() {
 
 }
 
-// C·06 — "Save ticket" result: shows the saved ticket image (preview) + a
+// C·07 — "Save ticket" result: shows the saved ticket image (preview) + a
 // confirmation toast, so the host sees exactly what was written to their photos.
 function TicketSaved() {
   return (
-    <Phone step="C·06" title="Ticket image saved" tag="Save ticket · preview">
+    <Phone step="C·07" title="Ticket image saved" tag="Save ticket · preview">
       <Scr className="center" style={{ gap: 12, position: "relative" }}>
         <Chip variant="ok"><span className="dot" /> Saved to your photos</Chip>
         <PassTicket code="7K2DQX9A" note="Enjoy one live for free." howto />
@@ -2350,6 +2394,13 @@ function Proposal() {
         <span><span className="check on" style={{ width: 16, height: 16 }} /> Invited — tap to remove</span>
       </div>
 
+      <p className="flow-intro" style={{ margin: "18px 0 5px", fontWeight: 700, color: "var(--ink)" }}>What the invited viewer gets — in-app push</p>
+      <p className="flow-intro" style={{ marginTop: 0 }}>The invited viewer receives a <b>push notification</b>. Tapping it opens the live room directly.</p>
+      <Strip>
+        <RcRoomNotif />
+        <RcInRoom step="B·08" tag="Tap → live room" toast="Welcome — you’re in the room" />
+      </Strip>
+
       <div className="section-label" style={{ marginTop: 30 }}>C · Free tickets — send &amp; track</div>
       <p className="flow-intro">From your profile, pick a Free ticket and send it to a friend. Tap <b>Send</b> for in-app delivery, or share via Link · WhatsApp · Instagram · Ticket Image. Sent and available tickets are tracked here.</p>
       <Strip>
@@ -2358,10 +2409,14 @@ function Proposal() {
         <PrSend />
         <PrSent />
       </Strip>
+      <div className="callout" style={{ margin: "16px 0 6px" }}><b>Recipient eligibility</b>: each account can receive only <b>one</b> guest ticket, and only within <b>30 days</b> of registering. Users who’ve already received one — or passed the 30-day window — show a disabled <b>Send</b>; tapping it explains why.</div>
+      <Strip>
+        <PrSendEligibility />
+      </Strip>
 
       <div className="callout" style={{ margin: "20px 0 6px" }}><b>Share via link or ticket</b>: tapping <b>Link</b> copies the link (toast confirmation). Tapping <b>Save ticket</b> saves the ticket image and shows a preview. The ticket redeems the same way wherever it’s saved.</div>
       <Strip>
-        <PrSend step="C·05" title="Link copied" tag="Copy link · toast" toast="Link copied to clipboard" />
+        <PrSend step="C·06" title="Link copied" tag="Copy link · toast" toast="Link copied to clipboard" />
         <TicketSaved />
       </Strip>
 
@@ -2399,7 +2454,7 @@ const PhoneDialog = ({ children }) =>
 // 1 · push notification on a lock screen
 function RcNotif() {
   return (
-    <Phone step="D·01" title="Ticket received" tag="Push notification">
+    <Phone step="D·01" title="Free ticket received" tag="Push notification">
       <Scr className="pad0">
         <div style={{ position: "relative", height: "100%", background: "linear-gradient(165deg, #2c2e27 0%, #16170f 100%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
           <div style={{ marginTop: 30, color: "#fff", textAlign: "center" }}>
@@ -2411,8 +2466,34 @@ function RcNotif() {
               <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--accent)", flex: "0 0 auto" }} />
               <div className="col" style={{ gap: 2, minWidth: 0 }}>
                 <div className="row between" style={{ gap: 6, flexWrap: "nowrap" }}><b style={{ fontSize: 11.5 }}>LIVE</b><span className="tiny mono">now</span></div>
-                <span style={{ fontSize: 11.5, fontWeight: 600 }}>You got a free entry ticket</span>
-                <span className="tiny">Mina sent you 1 free entry — tap to use it.</span>
+                <span style={{ fontSize: 11.5, fontWeight: 600 }}>Free ticket received</span>
+                <span className="tiny" style={{ lineHeight: 1.35 }}>Lucky you! @mina unlocked a FREE entry for you. Tap to use it now.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Scr>
+    </Phone>);
+
+}
+
+// in-app push: a host saved a seat for you in their room → tap opens the live room
+function RcRoomNotif() {
+  return (
+    <Phone step="B·07" title="Viewer invited to a room" tag="Push notification">
+      <Scr className="pad0">
+        <div style={{ position: "relative", height: "100%", background: "linear-gradient(165deg, #2c2e27 0%, #16170f 100%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <div style={{ marginTop: 30, color: "#fff", textAlign: "center" }}>
+            <div className="mono" style={{ fontSize: 11, opacity: .7, letterSpacing: ".06em" }}>MON, JUN 9</div>
+            <div style={{ fontSize: 48, fontWeight: 300, letterSpacing: "-0.02em", lineHeight: 1.05 }}>9:41</div>
+          </div>
+          <div style={{ position: "absolute", left: 10, right: 10, top: 138 }}>
+            <div style={{ background: "rgba(255,255,255,.94)", borderRadius: 14, padding: "10px 11px", display: "flex", gap: 9, alignItems: "flex-start", boxShadow: "0 8px 22px rgba(0,0,0,.32)" }}>
+              <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--accent)", flex: "0 0 auto" }} />
+              <div className="col" style={{ gap: 2, minWidth: 0 }}>
+                <div className="row between" style={{ gap: 6, flexWrap: "nowrap" }}><b style={{ fontSize: 11.5 }}>LIVE</b><span className="tiny mono">now</span></div>
+                <span style={{ fontSize: 11.5, fontWeight: 600 }}>Viewer invited to a room</span>
+                <span className="tiny" style={{ lineHeight: 1.35 }}>@mina saved you a seat in “Movie Night Club”. Tap to join now.</span>
               </div>
             </div>
           </div>
@@ -2445,7 +2526,7 @@ function RcUseTicket({ step = "D·02", tag = "Confirm before entry" }) {
 }
 
 // landed in the room
-function RcInRoom({ step = "D·03", tag = "Ticket used" }) {
+function RcInRoom({ step = "D·03", tag = "Ticket used", toast = "Welcome — free ticket used" }) {
   return (
     <Phone step={step} title="You’re in" tag={tag}>
       <Scr className="pad0">
@@ -2455,7 +2536,7 @@ function RcInRoom({ step = "D·03", tag = "Ticket used" }) {
             <Chip variant="warn"><span className="dot" /> LIVE</Chip>
             <Chip>◦ 129 watching</Chip>
           </div>
-          <div className="toast" style={{ top: 46 }}><span className="dot" style={{ color: "var(--accent)" }} /> Welcome — free ticket used</div>
+          <div className="toast" style={{ top: 46 }}><span className="dot" style={{ color: "var(--accent)" }} /> {toast}</div>
         </div>
       </Scr>
     </Phone>);
