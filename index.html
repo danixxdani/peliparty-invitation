@@ -1726,7 +1726,7 @@ function PrSend({ step = "C·03", title = "Choose recipient", tag = "Send a tick
 function PrSendEligibility() {
   const rows = [
   { h: "@sarakim123", s: "follows you", ok: true },
-  { h: "@leopark", s: "Already has a ticket", ok: false },
+  { h: "@leopark", s: "", ok: false },
   { h: "@jesscho", s: "follows you", ok: true },
   { h: "@danoh", s: "Joined 30+ days ago", ok: false }];
 
@@ -2466,8 +2466,7 @@ function RcNotif() {
               <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--accent)", flex: "0 0 auto" }} />
               <div className="col" style={{ gap: 2, minWidth: 0 }}>
                 <div className="row between" style={{ gap: 6, flexWrap: "nowrap" }}><b style={{ fontSize: 11.5 }}>LIVE</b><span className="tiny mono">now</span></div>
-                <span style={{ fontSize: 11.5, fontWeight: 600 }}>Free ticket received</span>
-                <span className="tiny" style={{ lineHeight: 1.35 }}>Lucky you! @mina unlocked a FREE entry for you. Tap to use it now.</span>
+                <span style={{ fontSize: 11.5, fontWeight: 600, lineHeight: 1.35 }}>Lucky you! @mina unlocked a FREE entry for you. Tap to use it now.</span>
               </div>
             </div>
           </div>
@@ -2492,8 +2491,7 @@ function RcRoomNotif() {
               <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--accent)", flex: "0 0 auto" }} />
               <div className="col" style={{ gap: 2, minWidth: 0 }}>
                 <div className="row between" style={{ gap: 6, flexWrap: "nowrap" }}><b style={{ fontSize: 11.5 }}>LIVE</b><span className="tiny mono">now</span></div>
-                <span style={{ fontSize: 11.5, fontWeight: 600 }}>Viewer invited to a room</span>
-                <span className="tiny" style={{ lineHeight: 1.35 }}>@mina saved you a seat in “Movie Night Club”. Tap to join now.</span>
+                <span style={{ fontSize: 11.5, fontWeight: 600, lineHeight: 1.35 }}>@mina saved you a seat in “Movie Night Club”. Tap to join now.</span>
               </div>
             </div>
           </div>
