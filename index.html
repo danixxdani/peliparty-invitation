@@ -2040,9 +2040,12 @@ function BcLive() {
 // B·02 — live: tap the share button → invite sheet mirrors C·03
 // (searchable people list + Send/Invite per row + external share row).
 // save=true (B·05) selects the "Save ticket" share option.
-function ViewerChoose({ save = false }) {
+// saved=true (B·06) keeps that selection and adds a toast confirming the room
+// ticket image was saved to the device gallery.
+function ViewerChoose({ save = false, saved = false }) {
+  save = save || saved;
   return (
-    <Phone step={save ? "B·05" : "B·02"} title="Invite viewers" tag={save ? "Save ticket selected" : "Choose how"}>
+    <Phone step={saved ? "B·06" : save ? "B·05" : "B·02"} title="Invite viewers" tag={saved ? "Saved to gallery" : save ? "Save ticket selected" : "Choose how"}>
       <Scr className="pad0">
         <div style={{ position: "relative", height: "100%" }}>
           <Thumb label="live now" style={{ width: "100%", height: "100%", borderRadius: 0, border: 0 }} />
@@ -2063,6 +2066,7 @@ function ViewerChoose({ save = false }) {
                   <span className="sicon" style={save ? { color: "var(--on-accent)", background: "var(--accent)", borderColor: "transparent" } : null}>▦</span>Save ticket</div>
               </div>
             </div>
+            {saved ? <div className="toast" style={{ bottom: 22, whiteSpace: "nowrap" }}><span className="dot" style={{ color: "var(--accent)" }} /> Room ticket saved to gallery</div> : null}
           </div>
         </div>
       </Scr>
@@ -2070,42 +2074,42 @@ function ViewerChoose({ save = false }) {
 
 }
 
-// A·05 — viewer invites: floating menu opens a sheet, MULTIPLE selection
+// B·03 — same sheet as B·02, but after tapping a row's "Invite":
+// a toast confirms "{username} invited" and that row flips to an "Invited" state.
 function ViewerInvite() {
+  const invited = "@sarakim123";
   return (
-    <Phone step="B·03" title="Invite viewers" tag="In-app · add many">
+    <Phone step="B·03" title="Invite viewers" tag="Invite tapped · toast">
       <Scr className="pad0">
         <div style={{ position: "relative", height: "100%" }}>
           <Thumb label="live now" style={{ width: "100%", height: "100%", borderRadius: 0, border: 0 }} />
-          <div style={{ position: "absolute", top: 12, left: 12, display: "flex", gap: 6 }}>
-            <Chip variant="warn"><span className="dot" /> LIVE</Chip>
-          </div>
+          <div style={{ position: "absolute", top: 12, left: 12 }}><Chip variant="warn"><span className="dot" /> LIVE</Chip></div>
           <div style={{ position: "absolute", inset: 0, background: "rgba(20,20,16,.28)" }} />
-          <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, background: "var(--box)", borderRadius: "16px 16px 0 0", padding: "9px 11px 11px", display: "flex", flexDirection: "column", gap: 6, maxHeight: "94%", boxShadow: "0 -8px 22px rgba(0,0,0,.22)" }}>
-            <div className="navbar" style={{ margin: "0 auto 2px" }} />
-            <div className="row between" style={{ flexWrap: "nowrap", gap: 8 }}>
-              <b style={{ fontSize: 13, whiteSpace: "nowrap" }}>Invite viewers</b>
-              <span className="tiny">Add as many as you like</span>
-            </div>
+          <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, background: "var(--box)", borderRadius: "16px 16px 0 0", padding: "9px 11px 13px", display: "flex", flexDirection: "column", gap: 8, maxHeight: "92%", boxShadow: "0 -8px 22px rgba(0,0,0,.22)" }}>
+            <div className="navbar" style={{ margin: "0 auto 1px" }} />
+            <b style={{ fontSize: 13 }}>Invite viewers</b>
+            <p className="tiny" style={{ margin: "-2px 2px 1px" }}>They’ll join this live for free</p>
             <div className="searchbar"><span className="si">⌕</span>Search username</div>
             <div className="col" style={{ gap: 0 }}>
-              <div className="userrow" style={{ padding: "6px 2px", gap: 6 }}>
-                <div className="avatar sm" />
-                <div className="col grow" style={{ gap: 0, minWidth: 0 }}><span className="un">@sarakim123</span><span className="uh">follows you</span></div>
-                <span className="check on" />
-              </div>
-              <div className="userrow" style={{ padding: "6px 2px", gap: 6 }}>
-                <div className="avatar sm" />
-                <div className="col grow" style={{ gap: 0, minWidth: 0 }}><span className="un">@leopark</span><span className="uh">12 mutuals</span></div>
-                <span className="check on" />
-              </div>
-              <div className="userrow" style={{ padding: "6px 2px", gap: 6 }}>
-                <div className="avatar sm" />
-                <div className="col grow" style={{ gap: 0, minWidth: 0 }}><span className="un">@jesscho</span><span className="uh">follows you</span></div>
-                <span className="check" />
+              {PEOPLE.slice(0, 3).map((u) =>
+              <div className="userrow" key={u.h} style={{ padding: "5px 2px" }}>
+                  <div className="avatar sm" />
+                  <div className="col grow" style={{ gap: 0, minWidth: 0 }}><span className="un">{u.h}</span>{u.s ? <span className="uh">{u.s}</span> : null}</div>
+                  {u.h === invited ?
+                  <Chip variant="ok"><span className="dot" /> Invited</Chip> :
+                  <Btn sm>Invite</Btn>}
+                </div>
+              )}
+            </div>
+            <div style={{ marginTop: 2 }}>
+              <div className="sharesheet compact">
+                <div className="sharebtn"><span className="sicon">↗</span>Link</div>
+                <div className="sharebtn"><span className="sicon wa">WA</span>WhatsApp</div>
+                <div className="sharebtn"><span className="sicon ig">IG</span>Instagram</div>
+                <div className="sharebtn"><span className="sicon">▦</span>Save ticket</div>
               </div>
             </div>
-            <Btn>Invite 2 selected</Btn>
+            <div className="toast" style={{ bottom: 14 }}><span className="dot" style={{ color: "var(--accent)" }} /> {invited} invited</div>
           </div>
         </div>
       </Scr>
@@ -2335,13 +2339,12 @@ function Proposal() {
         <BcLive />
         <ViewerChoose />
         <ViewerInvite />
-        <BcLiveInvited />
       </Strip>
       <p className="flow-intro" style={{ marginTop: 18, marginBottom: 4, fontWeight: 700, color: "var(--ink)" }}>Or save a room ticket to share anywhere</p>
       <p className="flow-intro" style={{ marginTop: 0 }}>Same as setup: Save ticket creates a room ticket image for this live. It’s a shortcut, not a free ticket.</p>
       <Strip>
         <ViewerChoose save />
-        <RoomTicketSaved step="B·06" tag="Live · Save ticket" preLive={false} />
+        <ViewerChoose saved />
       </Strip>
       <p className="flow-intro" style={{ marginTop: 10, marginBottom: 4 }}>Selections are temporary — nothing is saved until you confirm.</p>
       <div className="legend" style={{ margin: "0 0 8px", gap: 18 }}>
